@@ -9,7 +9,8 @@ import Language.Haskell.TH
 generateTupleClass :: Int -> Q [Dec]
 generateTupleClass size = do
   unless (size > 0) $
-    fail $ "Non-positive size: " ++ size'
+    fail $
+      "Non-positive size: " ++ size'
   pure [cDecl]
   where
     size' = show size
@@ -28,9 +29,11 @@ generateTupleClass size = do
 generateTupleInstance :: Int -> Int -> Q [Dec]
 generateTupleInstance element size = do
   unless (size > 0) $
-    fail $ "Non-positive size: " ++ element'
+    fail $
+      "Non-positive size: " ++ element'
   unless (size >= element) $
-    fail $ "Can't extract element " ++ element' ++ " of " ++ size' ++ "-tuple"
+    fail $
+      "Can't extract element " ++ element' ++ " of " ++ size' ++ "-tuple"
   pure [iDecl]
   where
     element' = show element
@@ -40,7 +43,7 @@ generateTupleInstance element size = do
 
     x = mkName "x"
 
-    vars = [mkName ('t' : show n) | n <- [1..size]]
+    vars = [mkName ('t' : show n) | n <- [1 .. size]]
 
     signature = foldl (\acc var -> AppT acc (VarT var)) (TupleT size) vars
 
@@ -51,9 +54,9 @@ generateTupleInstance element size = do
 
 generateTupleBoilerplate :: Int -> Q [Dec]
 generateTupleBoilerplate size =
-  concatFor [1..size] $ \classDeclIndex -> do
+  concatFor [1 .. size] $ \classDeclIndex -> do
     cDecl <- generateTupleClass classDeclIndex
-    iDecls <- for [1..classDeclIndex] $ \instanceDeclIndex ->
+    iDecls <- for [1 .. classDeclIndex] $ \instanceDeclIndex ->
       generateTupleInstance instanceDeclIndex classDeclIndex
 
     pure $ concat (cDecl : iDecls)

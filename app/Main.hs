@@ -1,8 +1,8 @@
-{-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE FunctionalDependencies #-}
 {-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE FunctionalDependencies #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TemplateHaskell #-}
 
 import Language.Haskell.TH
 import Lib
@@ -18,7 +18,8 @@ z = show v
 
 main :: IO ()
 main = do
-  let res :: Integer = $compose (*3) (+2) 1
+  let res :: Integer = $compose (* 3) (+ 2) 1
   print res
 
-$(generateTupleBoilerplate 62)
+$(generateTupleBoilerplate 10)
+-- MAX tuple size = 62
