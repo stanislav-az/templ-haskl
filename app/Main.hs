@@ -1,11 +1,16 @@
 {-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
-module Main (main) where
-
+import Language.Haskell.TH
 import Lib
+
+x :: Int
+x = 42
+
+$someSplice
+
+z :: String
+z = show x
 
 main :: IO ()
 main = do
