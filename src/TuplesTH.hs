@@ -48,3 +48,14 @@ generateTupleInstance element size = do
     iDecl = InstanceD Nothing [] (AppT (AppT (ConT className) signature) (VarT $ mkName ('t' : element'))) [mDecl]
     --   _X (_, _, ..., x, ...) = x
     mDecl = FunD methodName [Clause [TupP $ replicate (element - 1) WildP ++ [VarP x] ++ replicate (size - element) WildP] (NormalB $ VarE x) []]
+
+generateTupleBoilerplate :: Int -> Q [Dec]
+generateTupleBoilerplate size =
+  concatFor [1..size] $ \classDeclIndex -> do
+    cDecl <- generateTupleClass classDeclIndex
+    iDecls <- for [1..classDeclIndex] $ \instanceDeclIndex ->
+      generateTupleInstance instanceDeclIndex classDeclIndex
+
+    pure $ concat (cDecl : iDecls)
+  where
+    concatFor xs = fmap concat . for xs
