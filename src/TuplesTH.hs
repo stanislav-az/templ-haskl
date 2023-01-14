@@ -15,16 +15,22 @@ generateTupleClass size = do
   where
     size' = show size
     className = mkName ("Tuple" ++ size')
-    methodName = mkName ('_' : size')
+    getterName = mkName ('_' : size')
+    mapperName = mkName ("map" ++ size')
 
     t = mkName "t"
     r = mkName "r"
 
     -- class TupleX t r | t -> r where
-    cDecl = ClassD [] className [PlainTV t (), PlainTV r ()] [FunDep [t] [r]] [mDecl]
+    cDecl = ClassD [] className [PlainTV t (), PlainTV r ()] [FunDep [t] [r]] [getter, mapper]
 
-    --   _X :: t -> r
-    mDecl = SigD methodName (AppT (AppT ArrowT (VarT t)) (VarT r))
+    -- _X :: t -> r
+    getter = SigD getterName (AppT (AppT ArrowT (VarT t)) (VarT r))
+
+    -- mapX :: (r -> r) -> t -> t
+    mapper =
+      let innerArrow = AppT (AppT ArrowT (VarT r)) (VarT r)
+       in SigD mapperName (AppT (AppT ArrowT innerArrow) (AppT (AppT ArrowT (VarT t)) (VarT t)))
 
 generateTupleInstance :: Int -> Int -> Q [Dec]
 generateTupleInstance element size = do
@@ -39,7 +45,8 @@ generateTupleInstance element size = do
     element' = show element
     size' = show size
     className = mkName ("Tuple" ++ element')
-    methodName = mkName ('_' : element')
+    getterName = mkName ('_' : element')
+    mapperName = mkName ("map" ++ element')
 
     x = mkName "x"
 
@@ -48,9 +55,19 @@ generateTupleInstance element size = do
     signature = foldl (\acc var -> AppT acc (VarT var)) (TupleT size) vars
 
     -- instance TupleX (t1, ..., tX, ...) tX where
-    iDecl = InstanceD Nothing [] (AppT (AppT (ConT className) signature) (VarT $ mkName ('t' : element'))) [mDecl]
-    --   _X (_, _, ..., x, ...) = x
-    mDecl = FunD methodName [Clause [TupP $ replicate (element - 1) WildP ++ [VarP x] ++ replicate (size - element) WildP] (NormalB $ VarE x) []]
+    iDecl = InstanceD Nothing [] (AppT (AppT (ConT className) signature) (VarT $ mkName ('t' : element'))) [getter, mapper]
+
+    -- _X (_, _, ..., x, ...) = x
+    getter = FunD getterName [Clause [TupP $ replicate (element - 1) WildP ++ [VarP x] ++ replicate (size - element) WildP] (NormalB $ VarE x) []]
+
+    -- mapX f (t1, t2, ..., tX, ..., tN) = (t1, t2, ..., f tX, ..., tN)
+    mapper =
+      let f = mkName "f"
+          pats = map VarP vars
+          mkVarE i
+            | i == element = AppE (VarE f) (VarE $ mkName ('t' : show i))
+            | otherwise = VarE $ mkName ('t' : show i)
+       in FunD mapperName [Clause [VarP f, TupP pats] (NormalB $ TupE $ map (Just . mkVarE) [1 .. size]) []]
 
 generateTupleBoilerplate :: Int -> Q [Dec]
 generateTupleBoilerplate size =
