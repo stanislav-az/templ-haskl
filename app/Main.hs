@@ -2,6 +2,7 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE FunctionalDependencies #-}
+{-# LANGUAGE FlexibleInstances #-}
 
 import Language.Haskell.TH
 import Lib
@@ -21,3 +22,4 @@ main = do
   print res
 
 $(generateTupleClass 3)
+$(generateTupleInstance 3 5)
