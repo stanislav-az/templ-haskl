@@ -27,6 +27,7 @@ library
   exposed-modules:
       Lib
       Primes
+      PrimesTH
       TuplesTH
   other-modules:
       Paths_templ_haskl
