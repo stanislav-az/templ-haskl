@@ -23,3 +23,5 @@ main = do
 
 $(generateTupleBoilerplate 10)
 -- MAX tuple size = 62
+-- Can be rewritten as:
+-- generateTupleBoilerplate 10
