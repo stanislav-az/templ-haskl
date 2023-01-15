@@ -3,6 +3,8 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TemplateHaskell #-}
+{-# OPTIONS_GHC -ddump-splices #-} -- dumps generated th to stderr
+{-# OPTIONS_GHC -ddump-to-file #-} -- dumps generated th to .stack-work/somewhere/file.dump-splices
 
 import Language.Haskell.TH
 import Lib
