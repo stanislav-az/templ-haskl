@@ -18,4 +18,6 @@ myFunc = do
     (InfixE (Just (VarE x)) (VarE '(+)) (Just (LitE (IntegerL 1))))
     -- here we have an infix expression: we apply (+) to 'x' and integer
     -- literal 1
-    
+
+myFuncTyped :: (Quote m) => Code m (Integer -> Integer)
+myFuncTyped = [|| \x -> x + 1 ||]

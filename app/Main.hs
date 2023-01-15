@@ -7,6 +7,10 @@
 import Language.Haskell.TH
 import Lib
 import TuplesTH
+import CountableTH
+import Data.Word ( Word8 )
+import CountableTH
+import Data.Proxy
 
 v :: Int
 v = 42
@@ -21,7 +25,17 @@ main = do
   let res :: Integer = $compose (* 3) (+ 2) 1
   print res
 
-$(generateTupleBoilerplate 10)
 -- MAX tuple size = 62
 -- Can be rewritten as:
 -- generateTupleBoilerplate 10
+$(generateTupleBoilerplate 10)
+
+deriveCountable ''Bool
+deriveCountable ''Word8
+deriveCountable ''Char
+
+data Foo
+  = Foo Bool Bool
+  | Bar Word8 Bool
+
+deriveCountable ''Foo
